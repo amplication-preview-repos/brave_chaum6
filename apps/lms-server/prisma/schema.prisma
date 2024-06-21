@@ -1,0 +1,66 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Student {
+  answers   Answer[]
+  createdAt DateTime @default(now())
+  email     String?
+  id        String   @id @default(cuid())
+  name      String?
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId String?
+  updatedAt DateTime @updatedAt
+}
+
+model Teacher {
+  createdAt  DateTime    @default(now())
+  email      String?
+  id         String      @id @default(cuid())
+  name       String?
+  students   Student[]
+  updatedAt  DateTime    @updatedAt
+  worksheets Worksheet[]
+}
+
+model Worksheet {
+  createdAt   DateTime   @default(now())
+  description String?
+  id          String     @id @default(cuid())
+  questions   Question[]
+  teacher     Teacher?   @relation(fields: [teacherId], references: [id])
+  teacherId   String?
+  title       String?
+  updatedAt   DateTime   @updatedAt
+}
+
+model Answer {
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(cuid())
+  question   Question? @relation(fields: [questionId], references: [id])
+  questionId String?
+  student    Student?  @relation(fields: [studentId], references: [id])
+  studentId  String?
+  text       String?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Question {
+  answers     Answer[]
+  createdAt   DateTime               @default(now())
+  id          String                 @id @default(cuid())
+  text        String?
+  typeField   EnumQuestionTypeField?
+  updatedAt   DateTime               @updatedAt
+  worksheet   Worksheet?             @relation(fields: [worksheetId], references: [id])
+  worksheetId String?
+}
+
+enum EnumQuestionTypeField {
+  Option1
+}
